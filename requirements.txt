@@ -1,0 +1,43 @@
+# BlindSpot - AI-Powered Obstacle Detection
+# Phase 1: Data Collection Dependencies
+
+# Core Deep Learning
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+
+# Computer Vision
+opencv-python>=4.7.0
+Pillow>=9.5.0
+
+# COCO Dataset Tools
+pycocotools>=2.0.6
+requests>=2.31.0
+tqdm>=4.65.0
+
+# Data Processing
+pandas>=2.0.0
+pyyaml>=6.0
+
+# Image Processing & Augmentation
+scikit-image>=0.21.0
+imagehash>=4.3.1
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Utilities
+tqdm>=4.65.0
+scipy>=1.11.0
+
+# Frame selection tools
+scikit-learn>=1.3.0
+imagehash>=4.3.1
+
+# Future phases (commented out for now)
+# ultralytics>=8.0.0  # YOLOv8 (Phase 3: Training)
+# timm>=0.9.0  # MiDaS depth (Phase 4: Inference)
+# albumentations>=1.3.0  # Advanced augmentation (Phase 3)
+# pyttsx3>=2.90  # Text-to-speech (Phase 4)
+# tensorboard>=2.13.0  # Training monitoring (Phase 3)

@@ -1,0 +1,119 @@
+# BlindSpot Data Collection Configuration
+
+# COCO Dataset Settings
+coco:
+  download_url: "http://images.cocodataset.org"
+  output_dir: "data/raw/coco"
+  target_classes:
+    0: "person"
+    56: "chair"
+    57: "couch"
+    58: "potted plant"
+    59: "bed"
+    60: "dining table"
+    61: "toilet"
+    62: "tv"
+    63: "laptop"
+    64: "mouse"
+    65: "keyboard"
+    66: "cell phone"
+    67: "microwave"
+    69: "oven"
+    71: "sink"
+    72: "refrigerator"
+    73: "book"
+    74: "clock"
+    75: "vase"
+  splits:
+    - "train2017"
+    - "val2017"
+
+# SUN RGB-D Dataset Settings
+sun_rgbd:
+  output_dir: "data/raw/sun_rgbd"
+  target_scenes:
+    - "bedroom"
+    - "bathroom"
+    - "living_room"
+    - "kitchen"
+    - "dining_room"
+    - "office"
+    - "home_office"
+    - "corridor"
+    - "hallway"
+    - "stairs"
+  min_images_per_scene: 100
+
+# Custom Data Collection Settings
+custom:
+  output_dir: "data/raw/custom"
+
+  # Video frame extraction
+  extraction:
+    fps: 2.0  # Frames per second to extract
+    blur_threshold: 100.0  # Laplacian variance (higher = stricter)
+    min_brightness: 20  # 0-255
+    max_brightness: 235  # 0-255
+    jpeg_quality: 95  # Output JPEG quality
+
+  # Frame selection
+  selection:
+    num_frames: 300  # Frames to select per video/session
+    similarity_threshold: 5  # Perceptual hash distance
+    clustering_method: "kmeans"
+
+  # Priority classes for custom collection
+  priority_classes:
+    - "stairs_up"
+    - "stairs_down"
+    - "door_open"
+    - "door_closed"
+    - "table_edge"
+    - "low_obstacle"
+    - "furniture_leg"
+
+  # Recording guidelines
+  recording:
+    min_duration_minutes: 5
+    recommended_resolution: "1920x1080"
+    recommended_fps: 30
+    recommended_format: "mp4"
+
+# Dataset Targets
+dataset_targets:
+  total_images: 25000
+  sources:
+    coco:
+      target: 18000
+      actual: 0
+    sun_rgbd:
+      target: 5000
+      actual: 0
+    custom:
+      target: 2000
+      actual: 0
+
+  # Class distribution targets
+  min_samples_per_class:
+    common: 500  # Chairs, tables, etc.
+    critical: 100  # Stairs, edges
+    rare: 50  # Special cases
+
+# Data Quality Standards
+quality:
+  min_image_size:
+    width: 640
+    height: 480
+  max_image_size:
+    width: 1920
+    height: 1080
+  acceptable_blur_score: 100.0
+  acceptable_brightness_range: [20, 235]
+  max_duplicate_similarity: 5
+
+# Annotation Guidelines (for Phase 2)
+annotation:
+  format: "yolo"  # YOLO txt format
+  class_mapping: "config/classes.yaml"
+  min_bbox_size: 20  # pixels
+  confidence_threshold: 0.8
