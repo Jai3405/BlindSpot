@@ -53,10 +53,10 @@ class SpatialAnalyzer:
         self.center_zone = (image_width // 3, 2 * image_width // 3)
         self.right_zone = (2 * image_width // 3, image_width)
 
-        # Priority thresholds (meters)
-        self.critical_distance = 1.5  # < 1.5m = critical
-        self.warning_distance = 3.0   # < 3.0m = warning
-        self.info_distance = 5.0      # < 5.0m = info
+        # Priority thresholds (meters) - MORE AGGRESSIVE for safety
+        self.critical_distance = 2.5  # < 2.5m = critical (increased for earlier warning)
+        self.warning_distance = 4.0   # < 4.0m = warning
+        self.info_distance = 6.0      # < 6.0m = info
 
     def depth_to_distance(self, depth_value, depth_map):
         """
