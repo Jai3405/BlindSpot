@@ -37,6 +37,7 @@ models/pretrained/yolov8n.pt
 
 # Keep trained model
 !runs/train/blindspot_optimized/weights/best.pt
+!runs/merged_retrain/phase2_unfrozen/weights/best.pt
 
 # Temporary files
 *.jpg
