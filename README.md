@@ -1,385 +1,157 @@
-# BlindSpot 🦯
+# BlindSpot AI 🦯
 
-**AI-Powered Obstacle Detection System for Blind Navigation**
+![Python](https://img.shields.io/badge/Python-3.10-blue.svg) ![PyTorch](https://img.shields.io/badge/PyTorch-2.0-orange.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-BlindSpot is an end-to-end computer vision system designed to help blind and visually impaired individuals navigate indoor environments safely. It combines YOLOv8 object detection with MiDaS depth estimation to provide real-time spatial awareness through audio feedback.
+**An AI-Powered Navigation Assistant for the Visually Impaired, providing real-time environmental awareness through intelligent audio feedback.**
 
----
-
-## 🎯 Project Overview
-
-### Features
-
-- **Real-time Obstacle Detection**: Identifies common indoor obstacles (furniture, people, stairs, doors)
-- **Depth Estimation**: Calculates distance to obstacles using MiDaS
-- **Spatial Audio Feedback**: Stereo-panned text-to-speech alerts based on obstacle position
-- **Critical Hazard Detection**: Special focus on stairs, door states, and low obstacles
-- **Complete Training Pipeline**: Full data collection, annotation, and training workflow from scratch
-
-### Current Status: Phase 1 - Data Collection ✅
-
-This repository currently includes:
-- ✅ COCO dataset downloader with intelligent filtering
-- ✅ SUN RGB-D dataset integration tools
-- ✅ Video frame extraction with quality filtering
-- ✅ Intelligent frame selection using clustering
-- ✅ Comprehensive documentation
-
-**Coming Next:** Phase 2 - Data Annotation Tools
+BlindSpot is an end-to-end computer vision system that transforms a standard webcam feed into a rich, audible description of the surrounding world. It combines state-of-the-art object detection and depth estimation to identify obstacles, calculate their distance and position, and guide the user through complex indoor environments safely.
 
 ---
 
-## 📁 Project Structure
+## 🌟 Key Features
 
+- **Comprehensive Indoor Object Detection**: Identifies 24 essential indoor classes, including furniture (`chair`, `table`) and critical navigation obstacles (`stairs`, `door`, `wall`).
+- **Real-time Depth Estimation**: Accurately calculates the distance to detected objects using the MiDaS depth model.
+- **Intelligent Audio Guidance**: Provides clear, concise audio alerts about the environment.
+  - **Adaptive Frequency**: Alerts become more frequent as obstacles get closer.
+  - **Spatial Awareness**: Describes object positions ("on your left", "directly ahead").
+  - **Safe Path Suggestions**: Proactively suggests safe directions ("Safe path to your right").
+- **Interactive In-Demo Controls**: Full control over the application without stopping.
+  - Toggle audio, request detailed scene descriptions, print summaries, and access help on the fly.
+- **Enhanced Visual Interface**: A color-coded overlay provides at-a-glance status, object counts, FPS, and a safe direction indicator for sighted assistance and debugging.
+- **Complete 2-Phase Training Pipeline**: A sophisticated, reproducible workflow for merging datasets and fine-tuning models for specialized tasks.
+
+---
+
+## 🚀 Live Demo
+
+Below is a snapshot of the BlindSpot demo in action, identifying a `chair` and a `wall` while providing real-time status information in the overlay.
+
+*(This is a placeholder for a GIF of the demo running)*
 ```
-blindspot/
-├── data_collection/          # Phase 1: Data gathering tools
-│   ├── download_coco.py      # COCO dataset downloader
-│   ├── download_sun_rgbd.py  # SUN RGB-D downloader
-│   ├── video_to_frames.py    # Extract frames from videos
-│   └── frame_selector.py     # Select diverse frames for annotation
-│
-├── data_annotation/          # Phase 2: Annotation tools (coming soon)
-│   ├── coco_to_yolo.py       # Convert COCO → YOLO format
-│   ├── verify_annotations.py # Validate annotations
-│   └── augment_annotations.py # Generate augmented data
-│
-├── training/                 # Phase 3: Model training (coming soon)
-│   ├── train_yolo.py         # YOLOv8 training script
-│   ├── evaluate.py           # Model evaluation
-│   └── export_model.py       # Export to ONNX/TensorRT
-│
-├── src/                      # Phase 4: Inference system (coming soon)
-│   ├── detection.py          # YOLOv8 obstacle detector
-│   ├── depth_estimation.py   # MiDaS depth maps
-│   ├── spatial_analyzer.py   # 3D position calculator
-│   ├── audio_feedback.py     # Text-to-speech + spatial audio
-│   └── main.py               # Main application
-│
-├── data/                     # Dataset storage
-│   ├── raw/                  # Raw collected data
-│   │   ├── coco/             # COCO dataset
-│   │   ├── sun_rgbd/         # SUN RGB-D dataset
-│   │   └── custom/           # Custom recorded data
-│   └── processed/            # Processed training data
-│
-├── config/                   # Configuration files
-├── docs/                     # Documentation
-├── models/                   # Trained models
-├── notebooks/                # Jupyter notebooks for analysis
-└── scripts/                  # Utility scripts
+STATUS: CAUTION | Objects: 2 | FPS: 15 | Audio: ON
+Safe Direction: Right
+
+[INFO] chair detected at 2.1 meters on your left.
+[INFO] wall detected at 4.5 meters directly ahead.
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🧠 The Model: Performance & Strategy
 
-### Prerequisites
+The core of BlindSpot is a custom-trained YOLOv8n model, developed using a sophisticated 2-phase transfer learning strategy to achieve a unique set of capabilities.
 
-- Python 3.8+
-- 8GB+ RAM
-- 50GB+ free disk space (for full dataset)
-- (Optional) CUDA-capable GPU for training
+### Training Strategy
 
-### Installation
+1.  **Dataset Merging**: We combined two datasets:
+    *   **COCO**: Provided a strong foundation with 17 general object classes.
+    *   **Indoor Obstacles**: A custom dataset with 7 crucial navigation-related classes (`door`, `wall`, `stairs`, etc.).
+    This resulted in a comprehensive dataset of **5,301 images** across **24 classes**.
 
+2.  **Phase 1: Frozen Backbone Training (15 Epochs)**: We first trained only the detection head of the model, keeping the main body (backbone) frozen. This allowed the model to learn the 7 new indoor classes without forgetting its powerful, pre-existing knowledge from COCO.
+
+3.  **Phase 2: Full Fine-Tuning (25 Epochs)**: We then unfroze the entire model and continued training at a very low learning rate. This allowed the whole network to gently adapt and optimize its performance across all 24 classes simultaneously.
+
+### Final Model Performance
+
+This 2-phase approach was a success, creating a single, versatile model that outperforms specialized models for this task.
+
+| Model | Peak Accuracy (mAP@.50-.95) | Can Detect Furniture, etc.? | Can Detect Walls, Doors, etc.? |
+| :--- | :--- | :--- | :--- |
+| Original COCO | ~0.467 | ✅ Yes | ❌ **No** |
+| Indoor-only | ~0.323 | ❌ **No** | ✅ Yes |
+| **Our Final Model** | **0.290** | ✅ **Yes** | ✅ **Yes** |
+
+The final model's key metrics on the merged validation set are:
+- **mAP@.50-.95**: **0.290**
+- **Precision**: **~0.58**
+- **Recall**: **~0.43**
+
+---
+
+## 🛠️ Tech Stack
+
+- **Core Framework**: Python 3.10, PyTorch
+- **Object Detection**: Ultralytics YOLOv8
+- **Depth Estimation**: MiDaS (v3.1)
+- **Audio**: pyttsx3 (Text-to-Speech)
+- **Core Libraries**: OpenCV, NumPy, SciPy
+
+---
+
+## ⚙️ Setup and Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/Jai3405/BlindSpot.git
+    cd BlindSpot
+    ```
+
+2.  **Run the setup script:**
+    This will create a Python virtual environment and install all required dependencies.
+    ```bash
+    chmod +x scripts/setup_environment.sh
+    ./scripts/setup_environment.sh
+    ```
+
+3.  **Activate the environment:**
+    You must activate the virtual environment each time you want to run the application.
+    ```bash
+    source venv/bin/activate
+    ```
+
+---
+
+## ▶️ Usage
+
+The primary application is `demo_blindspot.py`. It can be run in several modes.
+
+### Live Webcam Demo
+
+This is the main mode of operation. Make sure your webcam is connected.
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/blindspot.git
-cd blindspot
-
-# Run setup script
-chmod +x scripts/setup_environment.sh
-./scripts/setup_environment.sh
-
-# Activate environment
-source venv/bin/activate
+python demo_blindspot.py --mode webcam --camera 0 --model runs/merged_retrain/phase2_unfrozen/weights/best.pt
 ```
+*   `--camera`: Use `0` for a built-in laptop webcam, `1` for an external USB webcam, etc.
 
-### Phase 1: Data Collection
+### Video File Demo
 
-#### 1. Download COCO Dataset
-
+Analyze a pre-recorded video file.
 ```bash
-# Download annotations only (fast, ~500MB)
-python data_collection/download_coco.py --no-images
-
-# Or download with images (slow, ~18GB)
-python data_collection/download_coco.py
+python demo_blindspot.py --mode video --source /path/to/your/video.mp4 --model runs/merged_retrain/phase2_unfrozen/weights/best.pt
 ```
 
-**Expected output:**
-- 15,000-20,000 filtered images with indoor obstacles
-- Annotations in COCO JSON format
-- Statistics file with class distribution
+### In-Demo Interactive Controls
 
-#### 2. Download SUN RGB-D Dataset (Optional)
+- **`q`**: Quit the application.
+- **`a`**: Toggle audio feedback ON/OFF.
+- **`d`**: Request a detailed, one-time description of the current scene.
+- **`s`**: Print a text summary of detected objects to the console.
+- **`h`**: Display the help menu with all available controls.
 
+---
+
+## 🔄 Re-training the Model
+
+The full training pipeline is included. You can re-run the entire 2-phase training process using the following command:
 ```bash
-# Download toolbox and metadata
-python data_collection/download_sun_rgbd.py
-
-# Follow instructions to download full dataset (~18GB)
-# See: docs/DATA_COLLECTION.md
+python model_training/train_merged_navigation.py
 ```
-
-#### 3. Collect Custom Data
-
-**Step 3a: Record Videos**
-
-Record videos of indoor environments focusing on:
-- Stairs (ascending/descending) - **Critical**
-- Doorways (open/closed)
-- Furniture and obstacles
-- Various lighting conditions
-
-See [docs/DATA_COLLECTION.md](docs/DATA_COLLECTION.md) for detailed recording guidelines.
-
-**Step 3b: Extract Frames**
-
-```bash
-# Single video
-python data_collection/video_to_frames.py \
-    --video my_video.mp4 \
-    --output data/raw/custom/frames \
-    --fps 2.0
-
-# Batch process
-python data_collection/video_to_frames.py \
-    --video-dir videos/ \
-    --output data/raw/custom/frames
-```
-
-**Step 3c: Select Diverse Frames**
-
-```bash
-python data_collection/frame_selector.py \
-    --input data/raw/custom/frames \
-    --output data/raw/custom/selected \
-    --num-frames 300
-```
-
-This intelligently selects 300 diverse frames for annotation using:
-- Perceptual hashing for duplicate removal
-- Feature extraction (color, texture, edges)
-- K-means clustering
-- Representative frame selection
-
----
-
-## 📊 Dataset Overview
-
-### Target Dataset Composition
-
-| Source | Images | Purpose |
-|--------|--------|---------|
-| **COCO 2017** | 15,000-20,000 | Common indoor objects (furniture, people, appliances) |
-| **SUN RGB-D** | 5,000-7,000 | Indoor scenes with depth information |
-| **Custom** | 2,000-3,000 | Critical classes (stairs, doors, edges, low obstacles) |
-| **Total** | **22,000-30,000** | Complete training dataset |
-
-### Target Classes
-
-#### From COCO (15 classes)
-- person, chair, couch, bed, dining_table
-- toilet, tv, laptop, potted_plant, refrigerator
-- book, clock, vase, microwave, keyboard
-
-#### Custom Classes (9 classes)
-- stairs_up, stairs_down
-- door_open, door_closed
-- table_edge, low_obstacle, furniture_leg
-- narrow_passage, glass_door
-
-**Total: 24 classes**
-
----
-
-## 📖 Documentation
-
-- **[Data Collection Guide](docs/DATA_COLLECTION.md)** - Complete data gathering workflow
-- **[Annotation Guide](docs/ANNOTATION_GUIDE.md)** *(coming soon)*
-- **[Training Guide](docs/TRAINING_GUIDE.md)** *(coming soon)*
-- **[API Reference](docs/API_REFERENCE.md)** *(coming soon)*
-
----
-
-## 🛠️ Tools & Technologies
-
-### Data Collection (Phase 1) ✅
-- **pycocotools** - COCO dataset API
-- **OpenCV** - Video processing and frame extraction
-- **scikit-learn** - K-means clustering for frame selection
-- **imagehash** - Perceptual hashing for duplicate detection
-- **NumPy/SciPy** - Numerical processing
-
-### Data Annotation (Phase 2) 🚧
-- **LabelImg** / **Roboflow** - Annotation tools
-- **Albumentations** - Data augmentation
-- **pycocotools** - Format conversion
-
-### Model Training (Phase 3) 🚧
-- **Ultralytics YOLOv8** - Object detection
-- **PyTorch** - Deep learning framework
-- **TensorBoard** / **W&B** - Training monitoring
-
-### Inference (Phase 4) 🚧
-- **YOLOv8** - Real-time detection
-- **MiDaS** - Depth estimation
-- **pyttsx3** - Text-to-speech
-- **PyAudio** - Spatial audio
-
----
-
-## 📈 Development Roadmap
-
-### ✅ Phase 1: Data Collection (COMPLETE)
-- [x] COCO dataset downloader
-- [x] SUN RGB-D integration
-- [x] Video frame extraction
-- [x] Intelligent frame selection
-- [x] Documentation
-
-### 🚧 Phase 2: Data Annotation (NEXT)
-- [ ] COCO to YOLO converter
-- [ ] Annotation verification tools
-- [ ] LabelImg setup guide
-- [ ] Dataset preparation script
-- [ ] Augmentation pipeline
-
-### 📅 Phase 3: Model Training
-- [ ] YOLOv8 training script (2-phase)
-- [ ] Custom augmentation for indoor scenes
-- [ ] Evaluation metrics
-- [ ] Model export (ONNX/TensorRT)
-- [ ] Training documentation
-
-### 📅 Phase 4: Inference System
-- [ ] Real-time detection module
-- [ ] Depth estimation integration
-- [ ] Spatial analysis and grid system
-- [ ] Audio feedback with stereo panning
-- [ ] Main application
-
-### 📅 Phase 5: Deployment
-- [ ] Mobile app (iOS/Android)
-- [ ] Edge device optimization
-- [ ] User testing
-- [ ] Performance optimization
-
----
-
-## 🤝 Contributing
-
-This is a research project for blind navigation assistance. Contributions are welcome!
-
-### Areas for Contribution
-- **Data Collection**: Record and share indoor navigation videos
-- **Annotation**: Help annotate images (especially stairs, doors)
-- **Model Training**: Experiment with different architectures
-- **Audio Feedback**: Improve spatial audio algorithms
-- **Testing**: User testing with blind individuals
-
-### How to Contribute
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
----
-
-## 📊 Current Statistics
-
-### Phase 1 Progress
-
-| Metric | Status |
-|--------|--------|
-| **Scripts Written** | 4/4 ✅ |
-| **Documentation** | 1/4 (25%) 🚧 |
-| **COCO Integration** | Complete ✅ |
-| **SUN RGB-D Integration** | Partial (manual processing) ⚠️ |
-| **Custom Data Tools** | Complete ✅ |
-
-### Dataset Collection Status
-
-| Source | Target | Collected | Status |
-|--------|--------|-----------|--------|
-| COCO | 15,000-20,000 | Ready to download | ⏳ |
-| SUN RGB-D | 5,000-7,000 | Manual processing | ⚠️ |
-| Custom | 2,000-3,000 | Tools ready | 🔧 |
-
----
-
-## ⚠️ Important Notes
-
-### Dataset Download Sizes
-- **COCO annotations**: ~500MB
-- **COCO images**: ~18GB (train) + ~1GB (val)
-- **SUN RGB-D**: ~18GB compressed
-
-**Recommendation**: Start with `--no-images` flag for COCO to get annotations first, then download images selectively.
-
-### Hardware Requirements
-
-**Minimum (Data Collection):**
-- CPU: Dual-core 2GHz+
-- RAM: 8GB
-- Storage: 50GB
-
-**Recommended (Training):**
-- CPU: 8-core
-- RAM: 16GB+
-- GPU: NVIDIA GPU with 6GB+ VRAM (RTX 3060 or better)
-- Storage: 100GB SSD
-
----
-
-## 📝 License
-
-MIT License - See [LICENSE](LICENSE) file for details.
+**Note**: This is a very long and computationally expensive process.
 
 ---
 
 ## 🙏 Acknowledgments
 
+This project stands on the shoulders of giants. Our sincere thanks to the creators and maintainers of:
 - **COCO Dataset**: [Lin et al., 2014](https://cocodataset.org/)
-- **SUN RGB-D**: [Song et al., 2015](http://rgbd.cs.princeton.edu/)
+- **Roboflow**: For providing the open-source Indoor Obstacles dataset.
 - **YOLOv8**: [Ultralytics](https://github.com/ultralytics/ultralytics)
 - **MiDaS**: [Intel ISL](https://github.com/isl-org/MiDaS)
 
 ---
 
-## 📧 Contact
+## 📝 License
 
-For questions, suggestions, or collaboration:
-- **GitHub Issues**: [Create an issue](https://github.com/yourusername/blindspot/issues)
-- **Email**: your.email@example.com
-
----
-
-## 🎯 Next Steps
-
-After completing Phase 1 data collection:
-
-```bash
-# 1. Review collected data
-ls data/raw/coco/images/
-ls data/raw/custom/selected/
-
-# 2. Read annotation guide
-cat docs/ANNOTATION_GUIDE.md
-
-# 3. Set up annotation tool (LabelImg)
-pip install labelImg
-labelImg
-
-# 4. Start annotating custom data
-# Focus on: stairs, doors, edges, low obstacles
-```
-
-**Ready to proceed to Phase 2: Data Annotation!** 🎉
-
----
-
-**Built with ❤️ for accessibility and independence**
+This project is licensed under the MIT License. See the `LICENSE` file for details.
