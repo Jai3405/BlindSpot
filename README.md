@@ -1,6 +1,6 @@
 # BlindSpot AI 🦯
 
-![Python](https://img.shields.io/badge/Python-3.10-blue.svg) ![PyTorch](https://img.shields.io/badge/PyTorch-2.0-orange.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Python](https://img.shields.io/badge/Python-3.10-blue.svg) ![PyTorch](https://img.shields.io/badge/PyTorch-2.0-orange.svg) 
 
 **An AI-Powered Navigation Assistant for the Visually Impaired, providing real-time environmental awareness through intelligent audio feedback.**
 
@@ -144,14 +144,8 @@ python model_training/train_merged_navigation.py
 
 ## 🙏 Acknowledgments
 
-This project stands on the shoulders of giants. Our sincere thanks to the creators and maintainers of:
+Our sincere thanks to the creators and maintainers of:
 - **COCO Dataset**: [Lin et al., 2014](https://cocodataset.org/)
 - **Roboflow**: For providing the open-source Indoor Obstacles dataset.
 - **YOLOv8**: [Ultralytics](https://github.com/ultralytics/ultralytics)
 - **MiDaS**: [Intel ISL](https://github.com/isl-org/MiDaS)
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
