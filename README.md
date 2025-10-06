@@ -80,6 +80,20 @@ The final model's key metrics on the merged validation set are:
 
 ---
 
+## Project Architecture
+
+The repository is organized by function, separating the data pipeline, training, and inference logic into distinct modules.
+
+-   `/data`: Holds all raw, processed, and merged datasets. The final dataset ready for training is located in `data/processed/merged_navigation/`.
+-   `/data_collection` & `/data_preparation`: The data engineering pipeline containing all scripts used to download, filter, merge, and standardize the datasets.
+-   `/model_training`: Contains the master `train_merged_navigation.py` script that executes the full 2-phase training workflow.
+-   `/inference`: The core application logic, encapsulating the `BlindSpotEngine` (YOLO+MiDaS models), `SpatialAnalyzer`, and `AudioFeedback` components.
+-   `demo_blindspot.py`: The main, runnable application that ties all components together and provides the user-facing demo.
+-   `/runs`: The output directory for all training experiments. The final, best model from our run is located in `runs/merged_retrain/phase2_unfrozen/`.
+-   `/docs` & `*.md`: All project documentation, including this README and the detailed Technical Report.
+
+---
+
 ## ⚙️ Setup and Installation
 
 1.  **Clone the repository:**
